@@ -1,0 +1,513 @@
+{
+  "info": {
+    "_postman_id": "a3f8e1b2-4c5d-4e6f-8a9b-0c1d2e3f4a5b",
+    "name": "Ecommerce Clothing API",
+    "description": "API surface for the clothing e-commerce app (Django + DRF backend, React frontend). Run requests top-to-bottom: Register/Login first to populate {{access_token}}, then Catalog -> Cart -> Orders.\n\nBase URL is set by the 'Ecommerce - Local' environment ({{base_url}} = http://localhost:8000/api), matching the docker-compose backend service on port 8000.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+  },
+  "variable": [{ "key": "base_url", "value": "http://localhost:8000/api" }],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{base_url}}/auth/register/", "host": ["{{base_url}}"], "path": ["auth", "register", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"jane_doe\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"StrongPassw0rd!\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Doe\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('access_token', data.access);",
+                  "pm.environment.set('refresh_token', data.refresh);"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Created",
+              "code": 201,
+              "status": "Created",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"user\": {\n    \"id\": 1,\n    \"username\": \"jane_doe\",\n    \"email\": \"jane@example.com\",\n    \"first_name\": \"Jane\",\n    \"last_name\": \"Doe\",\n    \"date_joined\": \"2026-06-18T10:00:00Z\"\n  },\n  \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.access...\",\n  \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{base_url}}/auth/login/", "host": ["{{base_url}}"], "path": ["auth", "login", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"jane_doe\",\n  \"password\": \"StrongPassw0rd!\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('access_token', data.access);",
+                  "pm.environment.set('refresh_token', data.refresh);"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.access...\",\n  \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{base_url}}/auth/refresh/", "host": ["{{base_url}}"], "path": ["auth", "refresh", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.access) { pm.environment.set('access_token', data.access); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.newaccess...\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/auth/me/", "host": ["{{base_url}}"], "path": ["auth", "me", ""] }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"username\": \"jane_doe\",\n  \"email\": \"jane@example.com\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Doe\",\n  \"date_joined\": \"2026-06-18T10:00:00Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Catalog / Categories",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{base_url}}/categories/", "host": ["{{base_url}}"], "path": ["categories", ""] }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"count\": 2,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    { \"id\": 1, \"name\": \"T-Shirts\", \"slug\": \"t-shirts\" },\n    { \"id\": 2, \"name\": \"Jackets\", \"slug\": \"jackets\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/categories/", "host": ["{{base_url}}"], "path": ["categories", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Jackets\"\n}" }
+          },
+          "response": [
+            {
+              "name": "Created",
+              "code": 201,
+              "status": "Created",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 2,\n  \"name\": \"Jackets\",\n  \"slug\": \"jackets\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Category",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": {
+              "raw": "{{base_url}}/categories/{{category_slug}}/",
+              "host": ["{{base_url}}"],
+              "path": ["categories", "{{category_slug}}", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"T-Shirts\",\n  \"slug\": \"t-shirts\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Catalog / Products",
+      "item": [
+        {
+          "name": "List Products",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": {
+              "raw": "{{base_url}}/products/?category__slug={{category_slug}}&search=cotton&ordering=price",
+              "host": ["{{base_url}}"],
+              "path": ["products", ""],
+              "query": [
+                { "key": "category__slug", "value": "{{category_slug}}" },
+                { "key": "search", "value": "cotton" },
+                { "key": "ordering", "value": "price" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"count\": 1,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"id\": 1,\n      \"name\": \"Classic Cotton Tee\",\n      \"slug\": \"classic-cotton-tee\",\n      \"brand\": \"Acme\",\n      \"category\": \"t-shirts\",\n      \"price\": \"19.99\",\n      \"is_active\": true\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/products/", "host": ["{{base_url}}"], "path": ["products", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Classic Cotton Tee\",\n  \"description\": \"100% cotton crew-neck t-shirt.\",\n  \"brand\": \"Acme\",\n  \"price\": \"19.99\",\n  \"category_id\": 1\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Created",
+              "code": 201,
+              "status": "Created",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Classic Cotton Tee\",\n  \"slug\": \"classic-cotton-tee\",\n  \"description\": \"100% cotton crew-neck t-shirt.\",\n  \"brand\": \"Acme\",\n  \"category\": { \"id\": 1, \"name\": \"T-Shirts\", \"slug\": \"t-shirts\" },\n  \"price\": \"19.99\",\n  \"is_active\": true,\n  \"images\": [],\n  \"variants\": [],\n  \"created_at\": \"2026-06-18T10:05:00Z\",\n  \"updated_at\": \"2026-06-18T10:05:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Product",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": {
+              "raw": "{{base_url}}/products/{{product_slug}}/",
+              "host": ["{{base_url}}"],
+              "path": ["products", "{{product_slug}}", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Classic Cotton Tee\",\n  \"slug\": \"classic-cotton-tee\",\n  \"description\": \"100% cotton crew-neck t-shirt.\",\n  \"brand\": \"Acme\",\n  \"category\": { \"id\": 1, \"name\": \"T-Shirts\", \"slug\": \"t-shirts\" },\n  \"price\": \"19.99\",\n  \"is_active\": true,\n  \"images\": [\n    { \"id\": 1, \"image\": \"/media/products/tee-front.jpg\", \"alt_text\": \"Front view\" }\n  ],\n  \"variants\": [\n    { \"id\": 1, \"sku\": \"TEE-BLK-M\", \"size\": \"M\", \"color\": \"Black\", \"stock\": 25, \"price_override\": null, \"price\": \"19.99\" },\n    { \"id\": 2, \"sku\": \"TEE-BLK-L\", \"size\": \"L\", \"color\": \"Black\", \"stock\": 15, \"price_override\": null, \"price\": \"19.99\" }\n  ],\n  \"created_at\": \"2026-06-18T10:05:00Z\",\n  \"updated_at\": \"2026-06-18T10:05:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/products/{{product_slug}}/",
+              "host": ["{{base_url}}"],
+              "path": ["products", "{{product_slug}}", ""]
+            },
+            "body": { "mode": "raw", "raw": "{\n  \"price\": \"17.99\"\n}" }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Classic Cotton Tee\",\n  \"slug\": \"classic-cotton-tee\",\n  \"price\": \"17.99\",\n  \"is_active\": true\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/products/{{product_slug}}/",
+              "host": ["{{base_url}}"],
+              "path": ["products", "{{product_slug}}", ""]
+            }
+          },
+          "response": [
+            { "name": "No Content", "code": 204, "status": "No Content", "header": [], "body": "" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Get My Cart",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/cart/", "host": ["{{base_url}}"], "path": ["cart", ""] }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"items\": [\n    {\n      \"id\": 1,\n      \"product_name\": \"Classic Cotton Tee\",\n      \"size\": \"M\",\n      \"color\": \"Black\",\n      \"unit_price\": \"19.99\",\n      \"quantity\": 2\n    }\n  ],\n  \"total\": \"39.98\",\n  \"updated_at\": \"2026-06-18T10:10:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/cart/items/", "host": ["{{base_url}}"], "path": ["cart", "items", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"variant_id\": {{variant_id}},\n  \"quantity\": 2\n}" }
+          },
+          "response": [
+            {
+              "name": "Created",
+              "code": 201,
+              "status": "Created",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"items\": [\n    {\n      \"id\": 1,\n      \"product_name\": \"Classic Cotton Tee\",\n      \"size\": \"M\",\n      \"color\": \"Black\",\n      \"unit_price\": \"19.99\",\n      \"quantity\": 2\n    }\n  ],\n  \"total\": \"39.98\",\n  \"updated_at\": \"2026-06-18T10:10:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Cart Item Quantity",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/cart/items/{{cart_item_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["cart", "items", "{{cart_item_id}}", ""]
+            },
+            "body": { "mode": "raw", "raw": "{\n  \"quantity\": 3\n}" }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"items\": [\n    {\n      \"id\": 1,\n      \"product_name\": \"Classic Cotton Tee\",\n      \"size\": \"M\",\n      \"color\": \"Black\",\n      \"unit_price\": \"19.99\",\n      \"quantity\": 3\n    }\n  ],\n  \"total\": \"59.97\",\n  \"updated_at\": \"2026-06-18T10:12:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remove Cart Item",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/cart/items/{{cart_item_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["cart", "items", "{{cart_item_id}}", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"items\": [],\n  \"total\": 0,\n  \"updated_at\": \"2026-06-18T10:13:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/cart/", "host": ["{{base_url}}"], "path": ["cart", ""] }
+          },
+          "response": [
+            { "name": "No Content", "code": 204, "status": "No Content", "header": [], "body": "" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Checkout (Create Order from Cart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/orders/", "host": ["{{base_url}}"], "path": ["orders", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipping_address\": \"123 Main St, Apt 4B\",\n  \"shipping_city\": \"Kathmandu\",\n  \"shipping_postal_code\": \"44600\",\n  \"shipping_country\": \"Nepal\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Created",
+              "code": 201,
+              "status": "Created",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"status\": \"pending\",\n  \"shipping_address\": \"123 Main St, Apt 4B\",\n  \"shipping_city\": \"Kathmandu\",\n  \"shipping_postal_code\": \"44600\",\n  \"shipping_country\": \"Nepal\",\n  \"total\": \"59.97\",\n  \"items\": [\n    {\n      \"id\": 1,\n      \"product_name\": \"Classic Cotton Tee\",\n      \"size\": \"M\",\n      \"color\": \"Black\",\n      \"unit_price\": \"19.99\",\n      \"quantity\": 3\n    }\n  ],\n  \"created_at\": \"2026-06-18T10:15:00Z\",\n  \"updated_at\": \"2026-06-18T10:15:00Z\"\n}"
+            },
+            {
+              "name": "Bad Request - Empty Cart",
+              "code": 400,
+              "status": "Bad Request",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"detail\": \"Cart is empty.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List My Orders",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/orders/", "host": ["{{base_url}}"], "path": ["orders", ""] }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"count\": 1,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"id\": 1,\n      \"status\": \"pending\",\n      \"total\": \"59.97\",\n      \"created_at\": \"2026-06-18T10:15:00Z\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Order Detail",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/orders/{{order_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "{{order_id}}", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"status\": \"pending\",\n  \"shipping_address\": \"123 Main St, Apt 4B\",\n  \"shipping_city\": \"Kathmandu\",\n  \"shipping_postal_code\": \"44600\",\n  \"shipping_country\": \"Nepal\",\n  \"total\": \"59.97\",\n  \"items\": [\n    {\n      \"id\": 1,\n      \"product_name\": \"Classic Cotton Tee\",\n      \"size\": \"M\",\n      \"color\": \"Black\",\n      \"unit_price\": \"19.99\",\n      \"quantity\": 3\n    }\n  ],\n  \"created_at\": \"2026-06-18T10:15:00Z\",\n  \"updated_at\": \"2026-06-18T10:15:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Order Status (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/orders/{{order_id}}/status/",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "{{order_id}}", "status", ""]
+            },
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"shipped\"\n}" }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "code": 200,
+              "status": "OK",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"status\": \"shipped\",\n  \"total\": \"59.97\"\n}"
+            },
+            {
+              "name": "Forbidden - Not Admin",
+              "code": 403,
+              "status": "Forbidden",
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"detail\": \"You do not have permission to perform this action.\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
