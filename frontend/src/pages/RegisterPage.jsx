@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function RegisterPage() {
@@ -31,34 +31,45 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="form-page form-card">
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Username
-          <input value={form.username} onChange={update("username")} required />
-        </label>
-        <label>
-          Email
-          <input type="email" value={form.email} onChange={update("email")} required />
-        </label>
-        <label>
-          First name
-          <input value={form.first_name} onChange={update("first_name")} />
-        </label>
-        <label>
-          Last name
-          <input value={form.last_name} onChange={update("last_name")} />
-        </label>
-        <label>
-          Password
-          <input type="password" value={form.password} onChange={update("password")} required />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <button className="btn-primary" type="submit">
-          Create account
-        </button>
-      </form>
+    <div>
+      <div className="page-top-bar">
+        <h1>Create Account</h1>
+      </div>
+      <div className="app-content form-page">
+        <div className="form-card">
+          <form onSubmit={handleSubmit}>
+            <label>
+              Username
+              <input value={form.username} onChange={update("username")} required />
+            </label>
+            <label>
+              Email
+              <input type="email" value={form.email} onChange={update("email")} required />
+            </label>
+            <div className="form-row">
+              <label>
+                First name
+                <input value={form.first_name} onChange={update("first_name")} />
+              </label>
+              <label>
+                Last name
+                <input value={form.last_name} onChange={update("last_name")} />
+              </label>
+            </div>
+            <label>
+              Password
+              <input type="password" value={form.password} onChange={update("password")} required />
+            </label>
+            {error && <p className="error">{error}</p>}
+            <button className="btn-block" type="submit">
+              Create account
+            </button>
+          </form>
+          <p className="form-switch">
+            Already have an account? <Link to="/login">Login</Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

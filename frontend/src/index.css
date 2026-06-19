@@ -1,18 +1,37 @@
 :root {
-  --color-primary: #0f766e;
-  --color-primary-dark: #0b5a54;
-  --color-bg: #f6f7f8;
+  /* Nepal-inspired red / white / dark-gray palette */
+  --color-primary: #e22433;
+  --color-primary-dark: #b81b28;
+  --color-primary-light: #fdeaec;
+  --color-dark: #1c1c1e;
+  --color-dark-soft: #2c2c30;
+  --color-bg: #f6f5f7;
   --color-surface: #ffffff;
-  --color-border: #e3e5e8;
-  --color-text: #1a1a1a;
-  --color-text-muted: #6b7280;
-  --color-danger: #c62828;
-  --color-success: #2e7d32;
-  --radius: 10px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --color-border: #ebe9ec;
+  --color-text: #1c1c1e;
+  --color-text-muted: #80808a;
+  --color-danger: #d62839;
+  --color-success: #1e9e5a;
+  --color-warning: #c97a14;
+  --color-gold: #e2a92a;
 
-  font: 16px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 2px 8px rgba(28, 28, 30, 0.06);
+  --shadow-md: 0 8px 24px rgba(28, 28, 30, 0.1);
+  --shadow-lg: 0 16px 40px rgba(28, 28, 30, 0.16);
+  --shadow-primary: 0 10px 24px rgba(226, 36, 51, 0.28);
+
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.4);
+
+  --app-max-width: 480px;
+  --desktop-nav-h: 64px;
+
+  font: 15px/1.5 "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
   color-scheme: light;
 }
 
@@ -20,10 +39,15 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  background: var(--color-bg);
+  background: var(--color-dark);
   color: var(--color-text);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
@@ -31,21 +55,41 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration: underline;
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Poppins", "Inter", system-ui, sans-serif;
+  color: var(--color-dark);
+  margin: 0;
 }
 
 h1 {
-  font-size: 28px;
-  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 17px;
+  font-weight: 700;
 }
 
 h3 {
-  margin: 0;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 button {
   cursor: pointer;
   font-family: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: var(--color-primary);
 }

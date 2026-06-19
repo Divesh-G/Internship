@@ -1,17 +1,38 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import api from "../api";
-import ProductThumb from "../components/ProductThumb";
+import ProductCard from "../components/ProductCard";
+import SearchBar from "../components/SearchBar";
 import Spinner from "../components/Spinner";
-import { formatNPR } from "../utils/currency";
+import { CATEGORY_LIST } from "../data/mock";
+
+const SORT_OPTIONS = [
+  { value: "", label: "Recommended" },
+  { value: "price", label: "Price: Low to High" },
+  { value: "-price", label: "Price: High to Low" },
+  { value: "-created_at", label: "Newest First" },
+];
+
+const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL"];
 
 export default function ProductsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get("search") || "";
+  const categorySlug = searchParams.get("category") || "";
+  const ordering = searchParams.get("ordering") || "";
+
   const [products, setProducts] = useState([]);
+  const [variantsByProduct, setVariantsByProduct] = useState({});
   const [categories, setCategories] = useState([]);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [brand, setBrand] = useState("");
+  const [sizes, setSizes] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [searchInput, setSearchInput] = useState(search);
+
+  const categoryMeta = CATEGORY_LIST.find((c) => c.slug === categorySlug);
 
   useEffect(() => {
     api
@@ -20,64 +41,184 @@ export default function ProductsPage() {
       .catch(() => {});
   }, []);
 
+  const realCategorySlug = useMemo(() => {
+    if (!categoryMeta) return categorySlug;
+    const real = categories.find((c) =>
+      categoryMeta.match.some((m) => c.name.toLowerCase().includes(m) || c.slug.includes(m))
+    );
+    return real?.slug || "";
+  }, [categories, categoryMeta, categorySlug]);
+
   useEffect(() => {
     setLoading(true);
     const params = {};
     if (search) params.search = search;
-    if (category) params.category__slug = category;
+    if (realCategorySlug) params.category__slug = realCategorySlug;
+    if (ordering) params.ordering = ordering;
+    if (brand) params.brand = brand;
+
     api
       .get("/products/", { params })
-      .then((res) => {
-        setProducts(res.data.results ?? res.data);
+      .then(async (res) => {
+        const list = res.data.results ?? res.data;
+        setProducts(list);
         setError("");
+        const details = await Promise.all(
+          list.map((p) => api.get(`/products/${p.slug}/`).then((r) => r.data).catch(() => null))
+        );
+        const map = {};
+        details.forEach((d) => {
+          if (d) map[d.slug] = d.variants || [];
+        });
+        setVariantsByProduct(map);
       })
       .catch(() => setError("Could not load products. Is the backend running?"))
       .finally(() => setLoading(false));
-  }, [search, category]);
+  }, [search, realCategorySlug, ordering, brand]);
+
+  const brands = useMemo(() => [...new Set(products.map((p) => p.brand).filter(Boolean))], [products]);
+  const colorOptions = useMemo(() => {
+    const all = Object.values(variantsByProduct).flat();
+    return [...new Set(all.map((v) => v.color).filter(Boolean))];
+  }, [variantsByProduct]);
+
+  const filtered = products.filter((p) => {
+    const variants = variantsByProduct[p.slug] || [];
+    if (sizes.length && !variants.some((v) => sizes.includes(v.size))) return false;
+    if (colors.length && !variants.some((v) => colors.includes(v.color))) return false;
+    return true;
+  });
+
+  function updateParam(key, value) {
+    const next = new URLSearchParams(searchParams);
+    if (value) next.set(key, value);
+    else next.delete(key);
+    setSearchParams(next);
+  }
+
+  function toggleFrom(list, setList, value) {
+    setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
+  }
+
+  const activeFilterCount = (brand ? 1 : 0) + sizes.length + colors.length;
 
   return (
     <div>
-      <div className="page-hero">
-        <h1>Shop the collection</h1>
-        <p>Everyday clothing, priced in NPR.</p>
+      <div className="page-top-bar">
+        <h1>{categoryMeta ? categoryMeta.label : search ? `Results for "${search}"` : "All Products"}</h1>
       </div>
 
-      <div className="filters">
-        <input
-          placeholder="Search products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+      <div className="app-content">
+        <SearchBar
+          value={searchInput}
+          onChange={setSearchInput}
+          onSubmit={() => updateParam("search", searchInput)}
+          placeholder="लुगा, ब्रान्ड वा साइज खोज्नुहोस्..."
         />
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">All categories</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.slug}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+
+        <div className="filter-bar">
+          <select
+            className="chip"
+            style={{ flex: 1 }}
+            value={ordering}
+            onChange={(e) => updateParam("ordering", e.target.value)}
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          <button className="btn-outline" onClick={() => setSheetOpen(true)}>
+            Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+          </button>
+        </div>
+
+        {error && <p className="error">{error}</p>}
+        {loading && <Spinner label="Loading products..." />}
+
+        {!loading && (
+          <div className="product-grid">
+            {filtered.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+            {filtered.length === 0 && (
+              <div className="empty-state" style={{ gridColumn: "1 / -1" }}>
+                <p>No products found{categoryMeta ? ` in ${categoryMeta.label} yet` : ""}.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {error && <p className="error">{error}</p>}
-      {loading && <Spinner label="Loading products..." />}
-
-      {!loading && (
-        <div className="product-grid">
-          {products.map((p) => (
-            <Link to={`/products/${p.slug}`} key={p.id} className="product-card">
-              <ProductThumb name={p.name} />
-              <div className="product-card-body">
-                <h3>{p.name}</h3>
-                <p className="brand">{p.brand}</p>
-                <p className="price">{formatNPR(p.price)}</p>
-              </div>
-            </Link>
-          ))}
-          {products.length === 0 && (
-            <div className="empty-state">
-              <p>No products found.</p>
+      {sheetOpen && (
+        <div className="filter-sheet-backdrop" onClick={() => setSheetOpen(false)}>
+          <div className="filter-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="filter-sheet-head">
+              <h2>Filters</h2>
+              <button className="btn-ghost" onClick={() => setSheetOpen(false)}>
+                ✕
+              </button>
             </div>
-          )}
+
+            <div className="filter-group">
+              <h3>Brand</h3>
+              <div className="chip-row">
+                {brands.map((b) => (
+                  <button
+                    key={b}
+                    className={`chip${brand === b ? " active" : ""}`}
+                    onClick={() => setBrand(brand === b ? "" : b)}
+                  >
+                    {b}
+                  </button>
+                ))}
+                {brands.length === 0 && <span className="order-meta">No brands loaded yet.</span>}
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <h3>Size</h3>
+              <div className="chip-row">
+                {SIZE_OPTIONS.map((s) => (
+                  <button
+                    key={s}
+                    className={`chip${sizes.includes(s) ? " active" : ""}`}
+                    onClick={() => toggleFrom(sizes, setSizes, s)}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <h3>Color</h3>
+              <div className="chip-row">
+                {colorOptions.map((c) => (
+                  <button
+                    key={c}
+                    className={`chip${colors.includes(c) ? " active" : ""}`}
+                    onClick={() => toggleFrom(colors, setColors, c)}
+                  >
+                    {c}
+                  </button>
+                ))}
+                {colorOptions.length === 0 && <span className="order-meta">No colors loaded yet.</span>}
+              </div>
+            </div>
+
+            <button
+              className="btn-block"
+              onClick={() => {
+                setBrand("");
+                setSizes([]);
+                setColors([]);
+              }}
+            >
+              Clear Filters
+            </button>
+          </div>
         </div>
       )}
     </div>

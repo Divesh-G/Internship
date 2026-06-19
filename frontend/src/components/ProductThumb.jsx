@@ -1,21 +1,19 @@
-const PALETTE = ["#0f766e", "#7c3aed", "#b45309", "#be123c", "#1d4ed8", "#15803d"];
+import { gradientFor, iconForCategory } from "../data/mock";
 
-function colorFor(text) {
-  const code = (text || "").split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
-  return PALETTE[code % PALETTE.length];
-}
+const SIZE_CLASS = {
+  card: "product-thumb-card",
+  gallery: "product-thumb-gallery",
+  mini: "product-thumb-mini",
+  banner: "product-thumb-banner",
+};
 
-export default function ProductThumb({ name, size = "full" }) {
-  const initials = (name || "?")
-    .split(" ")
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-
+export default function ProductThumb({ name, category = "", size = "card", style }) {
   return (
-    <div className={`product-thumb product-thumb-${size}`} style={{ background: colorFor(name) }}>
-      {initials}
+    <div
+      className={`product-thumb ${SIZE_CLASS[size] || SIZE_CLASS.card}`}
+      style={{ background: gradientFor(name), ...style }}
+    >
+      <span className="product-thumb-icon">{iconForCategory(`${category} ${name}`)}</span>
     </div>
   );
 }
