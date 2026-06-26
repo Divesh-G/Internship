@@ -4,7 +4,6 @@ import api from "../api";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
 import Spinner from "../components/Spinner";
-import { CATEGORY_LIST } from "../data/mock";
 
 const SORT_OPTIONS = [
   { value: "", label: "Recommended" },
@@ -32,7 +31,7 @@ export default function ProductsPage() {
   const [colors, setColors] = useState([]);
   const [searchInput, setSearchInput] = useState(search);
 
-  const categoryMeta = CATEGORY_LIST.find((c) => c.slug === categorySlug);
+  const activeCategory = categories.find((c) => c.slug === categorySlug);
 
   useEffect(() => {
     api
@@ -41,24 +40,16 @@ export default function ProductsPage() {
       .catch(() => {});
   }, []);
 
-  const realCategorySlug = useMemo(() => {
-    if (!categoryMeta) return categorySlug;
-    const real = categories.find((c) =>
-      categoryMeta.match.some((m) => c.name.toLowerCase().includes(m) || c.slug.includes(m))
-    );
-    return real?.slug || "";
-  }, [categories, categoryMeta, categorySlug]);
-
   useEffect(() => {
-    setLoading(true);
     const params = {};
     if (search) params.search = search;
-    if (realCategorySlug) params.category__slug = realCategorySlug;
+    if (categorySlug) params.category__slug = categorySlug;
     if (ordering) params.ordering = ordering;
     if (brand) params.brand = brand;
 
-    api
-      .get("/products/", { params })
+    Promise.resolve()
+      .then(() => setLoading(true))
+      .then(() => api.get("/products/", { params }))
       .then(async (res) => {
         const list = res.data.results ?? res.data;
         setProducts(list);
@@ -74,7 +65,7 @@ export default function ProductsPage() {
       })
       .catch(() => setError("Could not load products. Is the backend running?"))
       .finally(() => setLoading(false));
-  }, [search, realCategorySlug, ordering, brand]);
+  }, [search, categorySlug, ordering, brand]);
 
   const brands = useMemo(() => [...new Set(products.map((p) => p.brand).filter(Boolean))], [products]);
   const colorOptions = useMemo(() => {
@@ -105,7 +96,7 @@ export default function ProductsPage() {
   return (
     <div>
       <div className="page-top-bar">
-        <h1>{categoryMeta ? categoryMeta.label : search ? `Results for "${search}"` : "All Products"}</h1>
+        <h1>{activeCategory ? activeCategory.name : search ? `Results for "${search}"` : "All Products"}</h1>
       </div>
 
       <div className="app-content">
@@ -144,7 +135,7 @@ export default function ProductsPage() {
             ))}
             {filtered.length === 0 && (
               <div className="empty-state" style={{ gridColumn: "1 / -1" }}>
-                <p>No products found{categoryMeta ? ` in ${categoryMeta.label} yet` : ""}.</p>
+                <p>No products found{activeCategory ? ` in ${activeCategory.name} yet` : ""}.</p>
               </div>
             )}
           </div>

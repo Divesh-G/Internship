@@ -8,10 +8,11 @@ import SearchBar from "../components/SearchBar";
 import Spinner from "../components/Spinner";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import { CATEGORY_LIST, getFlashSaleEnd } from "../data/mock";
+import { getFlashSaleEnd, iconForCategory } from "../data/mock";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const { user } = useAuth();
@@ -25,6 +26,10 @@ export default function HomePage() {
       .get("/products/")
       .then((res) => setProducts(res.data.results ?? res.data))
       .finally(() => setLoading(false));
+    api
+      .get("/categories/")
+      .then((res) => setCategories(res.data.results ?? res.data))
+      .catch(() => {});
   }, []);
 
   function runSearch() {
@@ -52,19 +57,21 @@ export default function HomePage() {
       <div className="app-content">
         <BannerSlider />
 
-        <div className="section">
-          <div className="section-head">
-            <h2>Shop by Category</h2>
+        {categories.length > 0 && (
+          <div className="section">
+            <div className="section-head">
+              <h2>Shop by Category</h2>
+            </div>
+            <div className="category-grid">
+              {categories.map((c) => (
+                <Link key={c.slug} to={`/products?category=${c.slug}`} className="category-tile">
+                  <span className="icon-circle">{iconForCategory(c.name)}</span>
+                  <span className="label">{c.name}</span>
+                </Link>
+              ))}
+            </div>
           </div>
-          <div className="category-grid">
-            {CATEGORY_LIST.map((c) => (
-              <Link key={c.slug} to={`/products?category=${c.slug}`} className="category-tile">
-                <span className="icon-circle">{c.icon}</span>
-                <span className="label">{c.label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
+        )}
 
         {loading && <Spinner label="Loading products..." />}
 

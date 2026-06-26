@@ -1,0 +1,19 @@
+Backend (PowerShell, from d:\Internship\backend):
+
+
+cd backend
+python -m venv .venv          # first time only
+.venv\Scripts\activate
+pip install -r requirements.txt   # first time only
+$env:DB_ENGINE = "sqlite"
+python manage.py migrate
+python manage.py runserver
+API will be at http://localhost:8000/api/.
+
+Frontend (separate terminal, from d:\Internship\frontend):
+
+
+cd frontend
+npm install   # first time only
+npm run dev
+App will be at http://localhost:5173, already configured via frontend/.env to call the API at http://localhost:8000/api.

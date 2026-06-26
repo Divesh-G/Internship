@@ -9,17 +9,16 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState(null);
 
   const refresh = useCallback(async () => {
-    if (!user) {
-      setCart(null);
-      return;
-    }
     const res = await api.get("/cart/");
     setCart(res.data);
-  }, [user]);
+  }, []);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (!user) return;
+    api.get("/cart/").then((res) => setCart(res.data));
+  }, [user]);
+
+  const visibleCart = user ? cart : null;
 
   async function addItem(variantId, quantity = 1) {
     const res = await api.post("/cart/items/", { variant_id: variantId, quantity });
@@ -42,7 +41,7 @@ export function CartProvider({ children }) {
   }
 
   return (
-    <CartContext.Provider value={{ cart, refresh, addItem, updateItem, removeItem, clear }}>
+    <CartContext.Provider value={{ cart: visibleCart, refresh, addItem, updateItem, removeItem, clear }}>
       {children}
     </CartContext.Provider>
   );

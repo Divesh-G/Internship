@@ -22,7 +22,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  let coupon = null;
+  let coupon;
   try {
     coupon = JSON.parse(localStorage.getItem(COUPON_KEY));
   } catch {

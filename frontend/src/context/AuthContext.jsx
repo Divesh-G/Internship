@@ -5,14 +5,10 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !!localStorage.getItem("access_token"));
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    if (!localStorage.getItem("access_token")) return;
     api
       .get("/auth/me/")
       .then((res) => setUser(res.data))
