@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #e53935;
+  --color-primary-dark: #c62828;
+}
+
+/* Undo frontend element-level heading overrides inside admin */
+.admin-root h1,
+.admin-root h2,
+.admin-root h3,
+.admin-root h4 {
+  font-size: unset;
+  font-weight: unset;
+  font-family: "Inter", "Poppins", system-ui, sans-serif;
+  color: unset;
+  margin: 0;
+  line-height: unset;
+}
+
+.admin-root a {
+  color: inherit;
+  text-decoration: none;
+}

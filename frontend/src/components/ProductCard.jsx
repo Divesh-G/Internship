@@ -15,7 +15,16 @@ export default function ProductCard({ product }) {
   return (
     <Link to={`/products/${product.slug}`} className="product-card">
       <div className="product-card-media">
-        <ProductThumb name={product.name} category={product.category} size="card" />
+        {product.images?.length > 0 ? (
+          <img
+            src={product.images[0].image}
+            alt={product.images[0].alt_text || product.name}
+            className="product-card-img"
+            loading="lazy"
+          />
+        ) : (
+          <ProductThumb name={product.name} category={product.category} size="card" />
+        )}
         {discount > 0 && <span className="badge-discount">-{discount}%</span>}
         <button
           className={`wishlist-heart${wishlisted ? " active" : ""}`}

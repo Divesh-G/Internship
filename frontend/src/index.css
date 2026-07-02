@@ -1,37 +1,65 @@
 :root {
-  /* Nepal-inspired red / white / dark-gray palette */
-  --color-primary: #e22433;
-  --color-primary-dark: #b81b28;
-  --color-primary-light: #fdeaec;
-  --color-dark: #1c1c1e;
-  --color-dark-soft: #2c2c30;
-  --color-bg: #f6f5f7;
-  --color-surface: #ffffff;
-  --color-border: #ebe9ec;
-  --color-text: #1c1c1e;
-  --color-text-muted: #80808a;
-  --color-danger: #d62839;
-  --color-success: #1e9e5a;
-  --color-warning: #c97a14;
-  --color-gold: #e2a92a;
+  /* Brand colors */
+  --color-primary: #e53935;
+  --color-primary-dark: #c62828;
+  --color-primary-light: #ffebee;
+  --color-primary-mid: #ef5350;
 
+  /* Neutrals */
+  --color-dark: #111827;
+  --color-dark-soft: #1f2937;
+  --color-dark-muted: #374151;
+  --color-bg: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3f4f6;
+  --color-border: #e5e7eb;
+  --color-border-dark: #d1d5db;
+
+  /* Text */
+  --color-text: #111827;
+  --color-text-2: #374151;
+  --color-text-muted: #6b7280;
+  --color-text-subtle: #9ca3af;
+
+  /* Semantic */
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-gold: #f59e0b;
+
+  /* Radius */
+  --radius-xs: 6px;
   --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --radius-pill: 999px;
 
-  --shadow-sm: 0 2px 8px rgba(28, 28, 30, 0.06);
-  --shadow-md: 0 8px 24px rgba(28, 28, 30, 0.1);
-  --shadow-lg: 0 16px 40px rgba(28, 28, 30, 0.16);
-  --shadow-primary: 0 10px 24px rgba(226, 36, 51, 0.28);
+  /* Shadows */
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.09);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.14);
+  --shadow-primary: 0 8px 28px rgba(229, 57, 53, 0.32);
 
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(255, 255, 255, 0.4);
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.80);
+  --glass-border: rgba(255, 255, 255, 0.50);
+  --glass-dark-bg: rgba(17, 24, 39, 0.85);
 
+  /* Layout */
   --app-max-width: 480px;
-  --desktop-nav-h: 64px;
+  --desktop-nav-h: 70px;
+  --content-max-w: 1320px;
 
-  font: 15px/1.5 "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+  /* Transitions */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 0.14s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-base: 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+
+  font: 15px/1.55 "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
   color-scheme: light;
 }
 
@@ -70,7 +98,7 @@ h1 {
 }
 
 h2 {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
 }
 

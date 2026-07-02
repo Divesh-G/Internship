@@ -10,6 +10,13 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { getFlashSaleEnd, iconForCategory } from "../data/mock";
 
+const TRUST_ITEMS = [
+  { icon: "🚚", title: "Free Delivery", desc: "On orders above Rs. 1,999" },
+  { icon: "↩️", title: "Easy Returns", desc: "7 days return policy" },
+  { icon: "✅", title: "100% Authentic", desc: "Genuine products only" },
+  { icon: "🔒", title: "Secure Payments", desc: "eSewa, Khalti & more" },
+];
+
 export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -43,6 +50,7 @@ export default function HomePage() {
 
   return (
     <div>
+      {/* Mobile-only top bar */}
       <div className="top-bar">
         <span className="brand">
           Sajilo<span>Style</span>
@@ -57,10 +65,27 @@ export default function HomePage() {
       <div className="app-content">
         <BannerSlider />
 
+        {/* Trust badges */}
+        <div className="trust-strip">
+          {TRUST_ITEMS.map((t) => (
+            <div key={t.title} className="trust-item">
+              <span className="trust-icon">{t.icon}</span>
+              <div className="trust-text">
+                <strong>{t.title}</strong>
+                <span>{t.desc}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Shop by Category */}
         {categories.length > 0 && (
           <div className="section">
             <div className="section-head">
               <h2>Shop by Category</h2>
+              <Link to="/categories" className="see-all">
+                See all
+              </Link>
             </div>
             <div className="category-grid">
               {categories.map((c) => (
@@ -73,7 +98,7 @@ export default function HomePage() {
           </div>
         )}
 
-        {loading && <Spinner label="Loading products..." />}
+        {loading && <Spinner label="Loading products…" />}
 
         {!loading && products.length === 0 && (
           <div className="empty-state">
@@ -83,6 +108,7 @@ export default function HomePage() {
 
         {!loading && products.length > 0 && (
           <>
+            {/* Flash Sale */}
             <div className="section">
               <div className="flash-sale">
                 <div className="flash-sale-head">
@@ -97,9 +123,10 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Trending Now */}
             <div className="section">
               <div className="section-head">
-                <h2>Trending Now</h2>
+                <h2>Trending Now 🔥</h2>
                 <Link to="/products" className="see-all">
                   See all
                 </Link>
@@ -111,9 +138,10 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* New Arrivals */}
             <div className="section">
               <div className="section-head">
-                <h2>New Arrivals</h2>
+                <h2>New Arrivals ✨</h2>
                 <Link to="/products?ordering=-created_at" className="see-all">
                   See all
                 </Link>
@@ -125,9 +153,10 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Recommended */}
             <div className="section">
               <div className="section-head">
-                <h2>{user ? `Recommended for ${user.username}` : "Recommended for You"}</h2>
+                <h2>{user ? `Picks for ${user.username} 👋` : "Recommended for You"}</h2>
               </div>
               <div className="product-grid">
                 {recommended.map((p) => (

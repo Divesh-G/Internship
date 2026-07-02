@@ -11,14 +11,16 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
+    user = serializers.CharField(source="user.username", read_only=True)
 
     class Meta:
         model = Order
         fields = [
-            "id", "status", "shipping_address", "shipping_city", "shipping_postal_code",
-            "shipping_country", "total", "items", "created_at", "updated_at",
+            "id", "user", "status", "shipping_address", "shipping_city",
+            "shipping_postal_code", "shipping_country", "total",
+            "items", "created_at", "updated_at",
         ]
-        read_only_fields = ["id", "status", "total", "items", "created_at", "updated_at"]
+        read_only_fields = ["id", "user", "status", "total", "items", "created_at", "updated_at"]
 
 
 class OrderStatusUpdateSerializer(serializers.ModelSerializer):

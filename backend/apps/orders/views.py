@@ -15,6 +15,9 @@ class OrderListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Staff/admin users see all orders; customers see only their own
+        if self.request.user.is_staff:
+            return Order.objects.prefetch_related("items").select_related("user").all()
         return Order.objects.filter(user=self.request.user).prefetch_related("items")
 
     @transaction.atomic
@@ -45,10 +48,14 @@ class OrderDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Staff/admin users can access any order
+        if self.request.user.is_staff:
+            return Order.objects.prefetch_related("items").select_related("user").all()
         return Order.objects.filter(user=self.request.user).prefetch_related("items")
 
 
 class OrderStatusUpdateView(APIView):
+    """Admin-only endpoint to update order status."""
     permission_classes = [permissions.IsAdminUser]
 
     def patch(self, request, pk):

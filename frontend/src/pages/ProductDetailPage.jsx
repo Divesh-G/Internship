@@ -102,24 +102,45 @@ export default function ProductDetailPage() {
         <div className="product-detail-layout">
           <div className="detail-gallery-col">
             <div className="gallery-main" onClick={() => setZoomed((z) => !z)}>
-              <ProductThumb
-                name={product.name + activeImage}
-                category={product.category?.name}
-                size="gallery"
-                style={zoomed ? { transform: "scale(1.15)", transition: "transform 0.25s ease" } : undefined}
-              />
+              {product.images?.length > 0 ? (
+                <img
+                  src={product.images[activeImage]?.image ?? product.images[0].image}
+                  alt={product.images[activeImage]?.alt_text || product.name}
+                  className="product-gallery-img"
+                  style={zoomed ? { transform: "scale(1.15)", transition: "transform 0.25s ease" } : undefined}
+                />
+              ) : (
+                <ProductThumb
+                  name={product.name + activeImage}
+                  category={product.category?.name}
+                  size="gallery"
+                  style={zoomed ? { transform: "scale(1.15)", transition: "transform 0.25s ease" } : undefined}
+                />
+              )}
             </div>
             <div className="gallery-thumbs">
-              {Array.from({ length: GALLERY_SLOTS }, (_, i) => (
-                <div
-                  key={i}
-                  className={`product-thumb-mini${i === activeImage ? " active" : ""}`}
-                  style={{ display: "flex" }}
-                  onClick={() => setActiveImage(i)}
-                >
-                  <ProductThumb name={product.name + i} category={product.category?.name} size="mini" />
-                </div>
-              ))}
+              {product.images?.length > 0
+                ? product.images.map((img, i) => (
+                    <div
+                      key={img.id}
+                      className={`product-thumb-mini${i === activeImage ? " active" : ""}`}
+                      style={{ display: "flex" }}
+                      onClick={() => setActiveImage(i)}
+                    >
+                      <img src={img.image} alt={img.alt_text || product.name} className="product-mini-img" />
+                    </div>
+                  ))
+                : Array.from({ length: GALLERY_SLOTS }, (_, i) => (
+                    <div
+                      key={i}
+                      className={`product-thumb-mini${i === activeImage ? " active" : ""}`}
+                      style={{ display: "flex" }}
+                      onClick={() => setActiveImage(i)}
+                    >
+                      <ProductThumb name={product.name + i} category={product.category?.name} size="mini" />
+                    </div>
+                  ))
+              }
             </div>
           </div>
 
