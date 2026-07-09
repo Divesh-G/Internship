@@ -6,7 +6,7 @@ from .models import Category, Product, ProductImage, ProductVariant
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ["id", "name", "slug"]
+        fields = ["id", "name", "slug", "image"]
         read_only_fields = ["id", "slug"]
 
 
@@ -38,7 +38,7 @@ class ProductVariantWriteSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(slug_field="slug", read_only=True)
+    category = CategorySerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
 
     class Meta:

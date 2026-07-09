@@ -33,9 +33,20 @@ export default function CategoriesPage() {
           <div className="category-card-grid">
             {categories.map((c) => (
               <Link key={c.slug} to={`/products?category=${c.slug}`} className="category-card">
-                <div className="category-card-art" style={{ background: gradientFor(c.slug) }}>
-                  <span>{iconForCategory(c.name)}</span>
-                </div>
+                {c.image ? (
+                  <div
+                    className="category-card-art"
+                    style={{
+                      backgroundImage: `url(${c.image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  />
+                ) : (
+                  <div className="category-card-art" style={{ background: gradientFor(c.slug) }}>
+                    <span>{iconForCategory(c.name)}</span>
+                  </div>
+                )}
                 <span className="category-card-label">{c.name}</span>
               </Link>
             ))}

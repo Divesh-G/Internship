@@ -6,6 +6,14 @@ import { useToast } from "../components/Toast";
 
 const ALL_STATUSES = ["pending", "paid", "shipped", "delivered", "cancelled"];
 
+const STATUS_STYLES = {
+  pending:   { active: "bg-amber-500 text-white",   hover: "hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700" },
+  paid:      { active: "bg-blue-600 text-white",    hover: "hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" },
+  shipped:   { active: "bg-purple-600 text-white",  hover: "hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700" },
+  delivered: { active: "bg-green-600 text-white",   hover: "hover:border-green-300 hover:bg-green-50 hover:text-green-700" },
+  cancelled: { active: "bg-gray-500 text-white",    hover: "hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700" },
+};
+
 export default function OrderDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -136,12 +144,12 @@ export default function OrderDetailPage() {
                   disabled={updating || order.status === s}
                   className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all capitalize flex items-center justify-between ${
                     order.status === s
-                      ? "bg-red-600 text-white shadow-sm"
-                      : "border border-gray-200 text-gray-700 hover:border-red-300 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                      ? `${STATUS_STYLES[s].active} shadow-sm`
+                      : `border border-gray-200 text-gray-500 ${STATUS_STYLES[s].hover} disabled:opacity-40`
                   }`}
                 >
                   {s}
-                  {order.status === s && <span className="text-xs opacity-75">● Current</span>}
+                  {order.status === s && <span className="text-xs opacity-80">✓ Current</span>}
                 </button>
               ))}
             </div>

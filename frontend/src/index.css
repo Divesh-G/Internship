@@ -51,7 +51,7 @@
   /* Layout */
   --app-max-width: 480px;
   --desktop-nav-h: 70px;
-  --content-max-w: 1320px;
+  --content-max-w: 1440px;
 
   /* Transitions */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);

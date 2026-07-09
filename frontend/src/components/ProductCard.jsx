@@ -23,7 +23,7 @@ export default function ProductCard({ product }) {
             loading="lazy"
           />
         ) : (
-          <ProductThumb name={product.name} category={product.category} size="card" />
+          <ProductThumb name={product.name} category={product.category?.name ?? product.category ?? ""} size="card" />
         )}
         {discount > 0 && <span className="badge-discount">-{discount}%</span>}
         <button

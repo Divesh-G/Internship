@@ -333,9 +333,8 @@ export default function ProductFormPage() {
               <button
                 type="button"
                 onClick={() => setField("is_active", !form.is_active)}
-                className={`w-11 h-6 rounded-full transition-colors relative ${
-                  form.is_active ? "bg-red-600" : "bg-gray-200"
-                }`}
+                className="w-11 h-6 rounded-full transition-all relative"
+                style={{ background: form.is_active ? "#22c55e" : "#d1d5db" }}
               >
                 <span
                   className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${

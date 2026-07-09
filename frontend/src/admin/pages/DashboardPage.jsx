@@ -18,39 +18,14 @@ import api from "../api";
 import Badge from "../components/Badge";
 import StatCard from "../components/StatCard";
 
-const REVENUE_DATA = [
-  { month: "Jan", revenue: 142000 },
-  { month: "Feb", revenue: 198000 },
-  { month: "Mar", revenue: 167000 },
-  { month: "Apr", revenue: 243000 },
-  { month: "May", revenue: 312000 },
-  { month: "Jun", revenue: 289000 },
-  { month: "Jul", revenue: 378000 },
-  { month: "Aug", revenue: 421000 },
-  { month: "Sep", revenue: 356000 },
-  { month: "Oct", revenue: 489000 },
-  { month: "Nov", revenue: 512000 },
-  { month: "Dec", revenue: 634000 },
-];
-
-const ORDER_STATUS_DATA = [
-  { name: "Delivered", value: 58, color: "#16a34a" },
-  { name: "Pending",   value: 22, color: "#d97706" },
-  { name: "Shipped",   value: 12, color: "#7c3aed" },
-  { name: "Cancelled", value: 8,  color: "#dc2626" },
-];
-
-const CATEGORY_DATA = [
-  { name: "T-Shirts", sales: 84 },
-  { name: "Jackets",  sales: 62 },
-  { name: "Trousers", sales: 47 },
-];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const STATUS_COLORS = { pending: "#d97706", paid: "#3b82f6", shipped: "#7c3aed", delivered: "#16a34a", cancelled: "#dc2626" };
 
 const QUICK_ACTIONS = [
-  { label: "Add Product", icon: "➕", to: "/products/new", color: "bg-red-600" },
-  { label: "View Orders", icon: "📦", to: "/orders", color: "bg-blue-600" },
-  { label: "Customers",   icon: "👥", to: "/customers", color: "bg-purple-600" },
-  { label: "Settings",    icon: "⚙️",  to: "/settings", color: "bg-slate-600" },
+  { label: "Add Product", icon: "➕", to: "/products/new" },
+  { label: "View Orders", icon: "📦", to: "/orders" },
+  { label: "Customers",   icon: "👥", to: "/customers" },
+  { label: "Settings",    icon: "⚙️",  to: "/settings" },
 ];
 
 function fmt(n) {
@@ -93,15 +68,45 @@ export default function DashboardPage() {
 
   const recentOrders = [...orders].slice(0, 6);
 
+  // Revenue by month (current year only)
+  const currentYear = new Date().getFullYear();
+  const monthlyRevenue = Array(12).fill(0);
+  orders
+    .filter((o) => o.status !== "cancelled" && new Date(o.created_at).getFullYear() === currentYear)
+    .forEach((o) => {
+      monthlyRevenue[new Date(o.created_at).getMonth()] += parseFloat(o.total || 0);
+    });
+  const revenueChartData = MONTHS.map((month, i) => ({ month, revenue: Math.round(monthlyRevenue[i]) }));
+
+  // Order status distribution
+  const statusCounts = {};
+  orders.forEach((o) => { statusCounts[o.status] = (statusCounts[o.status] || 0) + 1; });
+  const orderTotal = orders.length || 1;
+  const orderStatusChartData = Object.entries(statusCounts).map(([name, count]) => ({
+    name: name.charAt(0).toUpperCase() + name.slice(1),
+    value: Math.round((count / orderTotal) * 100),
+    color: STATUS_COLORS[name] || "#9ca3af",
+  }));
+
+  // Products per category
+  const categoryChartData = categories
+    .map((c) => ({
+      name: c.name.length > 9 ? c.name.slice(0, 9) + "…" : c.name,
+      count: products.filter((p) => p.category?.slug === c.slug).length,
+    }))
+    .filter((c) => c.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
   const STATS = [
-    { title: "Total Revenue",    value: fmt(totalRevenue || 634000), sub: "All time", icon: "₨", color: "primary", trend: 12.4 },
-    { title: "Total Orders",     value: orders.length || 1248,  sub: `${pendingOrders} pending`, icon: "📦", color: "blue",    trend: 8.1 },
-    { title: "Total Products",   value: products.length || 240, sub: `${lowStock} low stock`, icon: "👕", color: "purple",  trend: 3.2 },
-    { title: "Total Categories", value: categories.length || 12,sub: "Active", icon: "🗂️", color: "green", trend: 0 },
-    { title: "Delivered Orders", value: deliveredOrders || 842, sub: "Successfully", icon: "✓",  color: "green",  trend: 15.6 },
-    { title: "Pending Orders",   value: pendingOrders || 87,    sub: "Awaiting action", icon: "⏱", color: "amber",  trend: -2.1 },
-    { title: "Low Stock Items",  value: lowStock || 14,         sub: "Need restock", icon: "⚠", color: "amber",  trend: undefined },
-    { title: "Out of Stock",     value: outOfStock || 6,        sub: "Unavailable", icon: "✕",  color: "primary", trend: undefined },
+    { title: "Total Revenue",    value: fmt(totalRevenue), sub: "All time",       icon: "₨",  color: "primary" },
+    { title: "Total Orders",     value: orders.length,     sub: `${pendingOrders} pending`, icon: "📦", color: "blue" },
+    { title: "Total Products",   value: products.length,   sub: `${lowStock} low stock`,    icon: "👕", color: "purple" },
+    { title: "Total Categories", value: categories.length, sub: "Active",         icon: "🗂️", color: "green" },
+    { title: "Delivered Orders", value: deliveredOrders,   sub: "Completed",      icon: "✓",  color: "green" },
+    { title: "Pending Orders",   value: pendingOrders,     sub: "Awaiting action",icon: "⏱", color: "amber" },
+    { title: "Low Stock Items",  value: lowStock,          sub: "Need restock",   icon: "⚠", color: "amber" },
+    { title: "Out of Stock",     value: outOfStock,        sub: "Unavailable",    icon: "✕",  color: "primary" },
   ];
 
   return (
@@ -123,7 +128,7 @@ export default function DashboardPage() {
           <Link
             key={a.to}
             to={a.to}
-            className={`${a.color} text-white rounded-xl px-4 py-3 flex items-center gap-2.5 hover:opacity-90 transition-opacity shadow-sm`}
+            className="bg-white border border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-700 hover:text-red-600 rounded-xl px-4 py-3 flex items-center gap-2.5 transition-all shadow-sm"
           >
             <span className="text-lg">{a.icon}</span>
             <span className="text-sm font-semibold">{a.label}</span>
@@ -142,14 +147,14 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="font-bold text-gray-900">Revenue Overview</h3>
-              <p className="text-xs text-gray-400 mt-0.5">Monthly revenue in NPR</p>
+              <p className="text-xs text-gray-400 mt-0.5">Monthly revenue {currentYear} (NPR)</p>
             </div>
-            <span className="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-semibold">
-              ↑ 12.4% this year
+            <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-semibold">
+              {currentYear}
             </span>
           </div>
           <ResponsiveContainer width="100%" height={240}>
-            <AreaChart data={REVENUE_DATA} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+            <AreaChart data={revenueChartData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%"  stopColor="#e53935" stopOpacity={0.18} />
@@ -173,45 +178,55 @@ export default function DashboardPage() {
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <h3 className="font-bold text-gray-900 mb-1">Order Status</h3>
           <p className="text-xs text-gray-400 mb-4">Distribution by status</p>
-          <ResponsiveContainer width="100%" height={180}>
-            <PieChart>
-              <Pie data={ORDER_STATUS_DATA} cx="50%" cy="50%" innerRadius={50} outerRadius={75}
-                paddingAngle={3} dataKey="value">
-                {ORDER_STATUS_DATA.map((e, i) => (
-                  <Cell key={i} fill={e.color} />
+          {orderStatusChartData.length === 0 ? (
+            <div className="flex items-center justify-center h-48 text-gray-300 text-sm">No orders yet</div>
+          ) : (
+            <>
+              <ResponsiveContainer width="100%" height={180}>
+                <PieChart>
+                  <Pie data={orderStatusChartData} cx="50%" cy="50%" innerRadius={50} outerRadius={75}
+                    paddingAngle={3} dataKey="value">
+                    {orderStatusChartData.map((e, i) => (
+                      <Cell key={i} fill={e.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v, n) => [`${v}%`, n]}
+                    contentStyle={{ borderRadius: 10, border: "1px solid #f0f0f0", fontSize: 12 }} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="space-y-2 mt-2">
+                {orderStatusChartData.map((d) => (
+                  <div key={d.name} className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
+                      <span className="text-gray-600">{d.name}</span>
+                    </div>
+                    <span className="font-semibold text-gray-900">{d.value}%</span>
+                  </div>
                 ))}
-              </Pie>
-              <Tooltip formatter={(v, n) => [`${v}%`, n]}
-                contentStyle={{ borderRadius: 10, border: "1px solid #f0f0f0", fontSize: 12 }} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="space-y-2 mt-2">
-            {ORDER_STATUS_DATA.map((d) => (
-              <div key={d.name} className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
-                  <span className="text-gray-600">{d.name}</span>
-                </div>
-                <span className="font-semibold text-gray-900">{d.value}%</span>
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-          <h3 className="font-bold text-gray-900 mb-1">Sales by Category</h3>
-          <p className="text-xs text-gray-400 mb-4">Units sold this month</p>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={CATEGORY_DATA} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={true} vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #f0f0f0", fontSize: 12 }} />
-              <Bar dataKey="sales" fill="#e53935" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <h3 className="font-bold text-gray-900 mb-1">Products by Category</h3>
+          <p className="text-xs text-gray-400 mb-4">Number of products per category</p>
+          {categoryChartData.length === 0 ? (
+            <div className="flex items-center justify-center h-48 text-gray-300 text-sm">No products yet</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={categoryChartData} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={true} vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #f0f0f0", fontSize: 12 }} />
+                <Bar dataKey="count" fill="#e53935" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         <div className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">

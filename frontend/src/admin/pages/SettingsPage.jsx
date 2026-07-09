@@ -145,7 +145,8 @@ export default function SettingsPage() {
               </div>
               <button
                 onClick={() => setPayment((prev) => ({ ...prev, [p.key]: !prev[p.key] }))}
-                className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${payment[p.key] ? "bg-red-600" : "bg-gray-200"}`}
+                className="w-11 h-6 rounded-full transition-all relative shrink-0"
+                style={{ background: payment[p.key] ? "#22c55e" : "#d1d5db" }}
               >
                 <span
                   className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${payment[p.key] ? "translate-x-5" : "translate-x-0.5"}`}

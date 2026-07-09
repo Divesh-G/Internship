@@ -127,7 +127,8 @@ export default function CouponsPage() {
                   <td className="px-6 py-4">
                     <button
                       onClick={() => toggleActive(c.code)}
-                      className={`w-10 h-5 rounded-full transition-colors relative ${c.active ? "bg-red-600" : "bg-gray-200"}`}
+                      className="w-10 h-5 rounded-full transition-all relative"
+                      style={{ background: c.active ? "#22c55e" : "#d1d5db" }}
                     >
                       <span
                         className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${c.active ? "translate-x-5" : "translate-x-0.5"}`}

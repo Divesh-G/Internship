@@ -2277,14 +2277,31 @@ button:disabled {
     margin-top: 20px;
   }
 
-  /* Product grid */
+  /* Product grid — fixed columns so a single card never fills the whole row */
   .product-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 22px;
   }
 
+  /* On desktop, horizontal-scroll sections become a grid so cards fill the row */
+  .h-scroll {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+    overflow-x: visible;
+    margin: 0;
+    padding: 0;
+    scroll-snap-type: none;
+  }
+
+  .flash-sale .h-scroll {
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .h-scroll .product-card {
-    width: 210px;
+    width: auto;
   }
 
   /* Trust badges */
@@ -2358,6 +2375,16 @@ button:disabled {
     flex-direction: row;
     justify-content: space-between;
     text-align: left;
+  }
+}
+
+/* ===================================================================
+   Large desktop: ≥ 1400px — 5 columns
+   =================================================================== */
+@media (min-width: 1400px) {
+  .product-grid,
+  .h-scroll {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 

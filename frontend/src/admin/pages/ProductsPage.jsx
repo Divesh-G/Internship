@@ -5,9 +5,18 @@ import Badge from "../components/Badge";
 import Modal from "../components/Modal";
 import { useToast } from "../components/Toast";
 
-function ProductThumbPlaceholder({ name }) {
+function ProductThumb({ name, images }) {
   const colors = ["#e53935", "#1976d2", "#388e3c", "#7b1fa2", "#f57c00", "#00838f"];
   const idx = (name?.charCodeAt(0) ?? 0) % colors.length;
+  if (images?.length > 0) {
+    return (
+      <img
+        src={images[0].image}
+        alt={name}
+        className="w-10 h-12 rounded-lg shrink-0 object-cover"
+      />
+    );
+  }
   return (
     <div
       className="w-10 h-12 rounded-lg shrink-0 flex items-center justify-center text-white text-sm font-bold"
@@ -184,14 +193,14 @@ export default function ProductsPage() {
                           </td>
                           <td className="px-4 py-3.5">
                             <div className="flex items-center gap-3">
-                              <ProductThumbPlaceholder name={p.name} />
+                              <ProductThumb name={p.name} images={p.images} />
                               <div>
                                 <p className="font-semibold text-gray-900 text-sm leading-tight">{p.name}</p>
                                 <p className="text-xs text-gray-400 mt-0.5 font-mono">{p.slug}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="px-4 py-3.5 text-gray-600">{p.category?.name ?? "—"}</td>
+                          <td className="px-4 py-3.5 text-gray-600">{p.category?.name ?? p.category ?? "—"}</td>
                           <td className="px-4 py-3.5 text-gray-600">{p.brand || "—"}</td>
                           <td className="px-4 py-3.5 text-right font-semibold text-gray-900">
                             Rs. {parseFloat(p.price).toLocaleString()}
