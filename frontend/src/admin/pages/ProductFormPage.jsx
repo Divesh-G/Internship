@@ -333,14 +333,21 @@ export default function ProductFormPage() {
               <button
                 type="button"
                 onClick={() => setField("is_active", !form.is_active)}
-                className="w-11 h-6 rounded-full transition-all relative"
-                style={{ background: form.is_active ? "#22c55e" : "#d1d5db" }}
+                style={{
+                  position: "relative", width: 44, height: 24,
+                  borderRadius: 999, border: "none", padding: 0,
+                  cursor: "pointer", flexShrink: 0, boxShadow: "none",
+                  background: form.is_active ? "#22c55e" : "#d1d5db",
+                  transition: "background 0.15s",
+                }}
               >
-                <span
-                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                    form.is_active ? "translate-x-5" : "translate-x-0.5"
-                  }`}
-                />
+                <span style={{
+                  position: "absolute", top: 2,
+                  left: form.is_active ? 22 : 2,
+                  width: 20, height: 20, borderRadius: "50%",
+                  background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,.25)",
+                  transition: "left 0.15s",
+                }} />
               </button>
             </div>
           </div>

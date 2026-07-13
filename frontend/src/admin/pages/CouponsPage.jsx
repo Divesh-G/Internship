@@ -127,12 +127,21 @@ export default function CouponsPage() {
                   <td className="px-6 py-4">
                     <button
                       onClick={() => toggleActive(c.code)}
-                      className="w-10 h-5 rounded-full transition-all relative"
-                      style={{ background: c.active ? "#22c55e" : "#d1d5db" }}
+                      style={{
+                        position: "relative", width: 40, height: 20,
+                        borderRadius: 999, border: "none", padding: 0,
+                        cursor: "pointer", flexShrink: 0, boxShadow: "none",
+                        background: c.active ? "#22c55e" : "#d1d5db",
+                        transition: "background 0.15s",
+                      }}
                     >
-                      <span
-                        className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${c.active ? "translate-x-5" : "translate-x-0.5"}`}
-                      />
+                      <span style={{
+                        position: "absolute", top: 2,
+                        left: c.active ? 22 : 2,
+                        width: 16, height: 16, borderRadius: "50%",
+                        background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,.25)",
+                        transition: "left 0.15s",
+                      }} />
                     </button>
                   </td>
                   <td className="px-6 py-4 text-right">
