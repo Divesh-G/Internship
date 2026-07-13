@@ -10,13 +10,24 @@ class CartItemSerializer(serializers.ModelSerializer):
         source="variant", queryset=ProductVariant.objects.all(), write_only=True
     )
     product_name = serializers.CharField(source="variant.product.name", read_only=True)
+    product_slug = serializers.CharField(source="variant.product.slug", read_only=True)
+    product_image = serializers.SerializerMethodField()
     size = serializers.CharField(source="variant.size", read_only=True)
     color = serializers.CharField(source="variant.color", read_only=True)
     unit_price = serializers.DecimalField(source="variant.price", max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = CartItem
-        fields = ["id", "variant_id", "product_name", "size", "color", "unit_price", "quantity"]
+        fields = ["id", "variant_id", "product_name", "product_slug", "product_image", "size", "color", "unit_price", "quantity"]
+
+    def get_product_image(self, obj):
+        img = obj.variant.product.images.first()
+        if not img:
+            return None
+        request = self.context.get("request")
+        if request:
+            return request.build_absolute_uri(img.image.url)
+        return img.image.url
 
 
 class CartSerializer(serializers.ModelSerializer):

@@ -3,8 +3,9 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Category, Product, ProductImage
+from .models import Banner, Category, Product, ProductImage
 from .serializers import (
+    BannerSerializer,
     CategorySerializer,
     ProductDetailSerializer,
     ProductImageSerializer,
@@ -18,6 +19,19 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return request.user and request.user.is_staff
+
+
+class BannerViewSet(viewsets.ModelViewSet):
+    serializer_class = BannerSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
+
+    def get_queryset(self):
+        qs = Banner.objects.all()
+        is_staff = self.request.user and self.request.user.is_authenticated and self.request.user.is_staff
+        if not is_staff:
+            qs = qs.filter(is_active=True)
+        return qs
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

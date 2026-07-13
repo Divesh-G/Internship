@@ -66,7 +66,16 @@ export default function CartPage() {
           <div className="cart-layout">
             {cart.items.map((item) => (
               <div className="cart-item-card" key={item.id}>
-                <ProductThumb name={item.product_name} size="mini" />
+                {item.product_image ? (
+                  <img
+                    src={item.product_image}
+                    alt={item.product_name}
+                    className="product-thumb-mini"
+                    style={{ objectFit: "cover" }}
+                  />
+                ) : (
+                  <ProductThumb name={item.product_name} size="mini" />
+                )}
                 <div className="cart-item-info">
                   <h3>{item.product_name}</h3>
                   <p className="meta">

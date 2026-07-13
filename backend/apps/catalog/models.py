@@ -52,6 +52,26 @@ class ProductImage(models.Model):
         return f"{self.product.name} image"
 
 
+class Banner(models.Model):
+    title = models.CharField(max_length=200)
+    subtitle = models.CharField(max_length=300, blank=True)
+    cta = models.CharField(max_length=100, default="Shop Now")
+    gradient = models.CharField(
+        max_length=400,
+        default="linear-gradient(120deg, #e22433, #1c1c1e)",
+    )
+    image = models.ImageField(upload_to="banners/", blank=True, null=True)
+    emoji = models.CharField(max_length=10, blank=True)
+    order = models.PositiveSmallIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.title
+
+
 SIZE_CHOICES = [("XS", "XS"), ("S", "S"), ("M", "M"), ("L", "L"), ("XL", "XL"), ("XXL", "XXL")]
 
 

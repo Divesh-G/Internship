@@ -90,7 +90,15 @@ export default function HomePage() {
             <div className="category-grid">
               {categories.map((c) => (
                 <Link key={c.slug} to={`/products?category=${c.slug}`} className="category-tile">
-                  <span className="icon-circle">{iconForCategory(c.name)}</span>
+                  {c.image ? (
+                    <img
+                      src={c.image}
+                      alt={c.name}
+                      style={{ width: 58, height: 58, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+                    />
+                  ) : (
+                    <span className="icon-circle">{iconForCategory(c.name)}</span>
+                  )}
                   <span className="label">{c.name}</span>
                 </Link>
               ))}

@@ -30,7 +30,7 @@ export default function ProductCard({ product }) {
           className={`wishlist-heart${wishlisted ? " active" : ""}`}
           onClick={(e) => {
             e.preventDefault();
-            toggle({ slug: product.slug, name: product.name, price: product.price, brand: product.brand });
+            toggle({ slug: product.slug, name: product.name, price: product.price, brand: product.brand, images: product.images });
           }}
           aria-label="Toggle wishlist"
         >

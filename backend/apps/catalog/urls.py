@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    BannerViewSet,
     CategoryViewSet,
     ProductImageDeleteView,
     ProductImageUploadView,
@@ -9,6 +10,7 @@ from .views import (
 )
 
 router = DefaultRouter()
+router.register("banners", BannerViewSet, basename="banner")
 router.register("categories", CategoryViewSet, basename="category")
 router.register("products", ProductViewSet, basename="product")
 

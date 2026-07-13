@@ -32,6 +32,7 @@ import AdminOrdersPage from "./admin/pages/OrdersPage";
 import AdminOrderDetailPage from "./admin/pages/OrderDetailPage";
 import CustomersPage from "./admin/pages/CustomersPage";
 import CouponsPage from "./admin/pages/CouponsPage";
+import BannersPage from "./admin/pages/BannersPage";
 import SettingsPage from "./admin/pages/SettingsPage";
 
 const TAB_PATHS = ["/", "/categories", "/cart", "/wishlist", "/profile"];
@@ -130,6 +131,7 @@ function AdminApp() {
           <Route path="orders/:id" element={<AdminOrderDetailPage />} />
           <Route path="customers" element={<CustomersPage />} />
           <Route path="coupons" element={<CouponsPage />} />
+          <Route path="banners" element={<BannersPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>

@@ -11,7 +11,7 @@ class CartView(APIView):
 
     def get(self, request):
         cart, _ = Cart.objects.get_or_create(user=request.user)
-        return Response(CartSerializer(cart).data)
+        return Response(CartSerializer(cart, context={"request": request}).data)
 
     def delete(self, request):
         cart, _ = Cart.objects.get_or_create(user=request.user)
@@ -37,7 +37,7 @@ class CartItemListCreateView(generics.CreateAPIView):
             item.quantity += quantity
             item.save()
 
-        return Response(CartSerializer(cart).data, status=status.HTTP_201_CREATED)
+        return Response(CartSerializer(cart, context={"request": request}).data, status=status.HTTP_201_CREATED)
 
 
 class CartItemDetailView(generics.UpdateAPIView, generics.DestroyAPIView):
@@ -50,9 +50,9 @@ class CartItemDetailView(generics.UpdateAPIView, generics.DestroyAPIView):
     def update(self, request, *args, **kwargs):
         super().update(request, *args, **kwargs)
         cart = Cart.objects.get(user=request.user)
-        return Response(CartSerializer(cart).data)
+        return Response(CartSerializer(cart, context={"request": request}).data)
 
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
         cart = Cart.objects.get(user=request.user)
-        return Response(CartSerializer(cart).data)
+        return Response(CartSerializer(cart, context={"request": request}).data)
