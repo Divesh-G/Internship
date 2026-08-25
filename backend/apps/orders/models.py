@@ -13,8 +13,16 @@ class Order(models.Model):
         ("cancelled", "Cancelled"),
     ]
 
+    PAYMENT_METHOD_CHOICES = [
+        ("cod", "Cash on Delivery"),
+        ("esewa", "eSewa"),
+        ("khalti", "Khalti"),
+        ("imepay", "IME Pay"),
+    ]
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default="cod")
     shipping_address = models.TextField()
     shipping_city = models.CharField(max_length=100)
     shipping_postal_code = models.CharField(max_length=20)

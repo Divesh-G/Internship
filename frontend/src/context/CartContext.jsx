@@ -14,7 +14,10 @@ export function CartProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setCart(null);
+      return;
+    }
     api.get("/cart/").then((res) => setCart(res.data));
   }, [user]);
 

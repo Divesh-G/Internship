@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -32,9 +32,8 @@ export default function DesktopNav() {
       <div className="desktop-nav-top-strip">
         <span>🚚 Free Delivery all over Nepal on orders above Rs. 1,999</span>
         <div className="desktop-nav-strip-links">
-          <a href="#">Track Order</a>
+          <Link to={user ? "/orders" : "/login"}>Track Order</Link>
           <a href="#">Help &amp; Support</a>
-          <a href="#">Sell on SajiloStyle</a>
         </div>
       </div>
 

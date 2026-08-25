@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./AuthContext";
 
 const WishlistContext = createContext(null);
 const STORAGE_KEY = "sajilo_wishlist";
 
 export function WishlistProvider({ children }) {
+  const { user, loading } = useAuth();
   const [items, setItems] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
@@ -15,6 +17,13 @@ export function WishlistProvider({ children }) {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      setItems([]);
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [user, loading]);
 
   function isWishlisted(slug) {
     return items.some((p) => p.slug === slug);

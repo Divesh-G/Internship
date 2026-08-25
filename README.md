@@ -33,11 +33,11 @@ Falls back to SQLite, useful for quickly running the app on a machine without Do
 cd backend
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements.txt   #first time only 
 $env:DB_ENGINE = "sqlite"
 python manage.py migrate
-python manage.py seed_demo_data
-python manage.py createsuperuser
+python manage.py seed_demo_data #first time only
+python manage.py createsuperuser #first time only 
 python manage.py runserver
 ```
 

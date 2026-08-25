@@ -6,6 +6,13 @@ import { useToast } from "../components/Toast";
 
 const STATUS_TABS = ["all", "pending", "paid", "shipped", "delivered", "cancelled"];
 
+const PAYMENT_LABELS = {
+  cod: "Cash on Delivery",
+  esewa: "eSewa",
+  khalti: "Khalti",
+  imepay: "IME Pay",
+};
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -97,6 +104,7 @@ export default function OrdersPage() {
                     <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Customer</th>
                     <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Delivery</th>
                     <th className="text-right px-6 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Total</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Payment</th>
                     <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Status</th>
                     <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Date</th>
                     <th className="text-right px-6 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Action</th>
@@ -105,7 +113,7 @@ export default function OrdersPage() {
                 <tbody>
                   {paged.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="text-center py-16 text-gray-400">
+                      <td colSpan={8} className="text-center py-16 text-gray-400">
                         No orders found
                       </td>
                     </tr>
@@ -127,6 +135,9 @@ export default function OrdersPage() {
                           <span className="font-bold text-gray-900">
                             Rs. {parseFloat(o.total).toLocaleString()}
                           </span>
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 text-xs">
+                          {PAYMENT_LABELS[o.payment_method] || o.payment_method || "—"}
                         </td>
                         <td className="px-6 py-4">
                           <Badge status={o.status} />

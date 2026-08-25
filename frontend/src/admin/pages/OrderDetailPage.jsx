@@ -6,6 +6,13 @@ import { useToast } from "../components/Toast";
 
 const ALL_STATUSES = ["pending", "paid", "shipped", "delivered", "cancelled"];
 
+const PAYMENT_LABELS = {
+  cod: "Cash on Delivery",
+  esewa: "eSewa",
+  khalti: "Khalti",
+  imepay: "IME Pay",
+};
+
 const STATUS_STYLES = {
   pending:   { active: "bg-amber-500 text-white",   hover: "hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700" },
   paid:      { active: "bg-blue-600 text-white",    hover: "hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" },
@@ -167,7 +174,9 @@ export default function OrderDetailPage() {
             </div>
             <div className="flex justify-between text-sm text-gray-600">
               <span>Payment</span>
-              <span className="font-semibold text-gray-900">Cash on Delivery</span>
+              <span className="font-semibold text-gray-900">
+                {PAYMENT_LABELS[order.payment_method] || order.payment_method || "—"}
+              </span>
             </div>
             <div className="border-t border-gray-100 pt-3 flex justify-between font-bold">
               <span className="text-gray-900">Total</span>

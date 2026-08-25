@@ -3,7 +3,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../api";
 import Spinner from "../components/Spinner";
 import StatusBadge from "../components/StatusBadge";
+import OrderTracker from "../components/OrderTracker";
 import { formatNPR } from "../utils/currency";
+
+const PAYMENT_LABELS = {
+  cod: "Cash on Delivery",
+  esewa: "eSewa",
+  khalti: "Khalti",
+  imepay: "IME Pay",
+};
 
 export default function OrderDetailPage() {
   const { id } = useParams();
@@ -31,10 +39,16 @@ export default function OrderDetailPage() {
         {!order && !error && <Spinner label="Loading order..." />}
         {order && (
           <>
+            <OrderTracker status={order.status} />
+
             <div className="summary-card" style={{ marginBottom: 16 }}>
               <div className="summary-row">
                 <span>Status</span>
                 <StatusBadge status={order.status} />
+              </div>
+              <div className="summary-row">
+                <span>Payment method</span>
+                <span>{PAYMENT_LABELS[order.payment_method] || order.payment_method}</span>
               </div>
               <div className="summary-row">
                 <span>Shipping to</span>
